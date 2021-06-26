@@ -1,0 +1,23 @@
+More Generalized Loops in GNU dc
+Dylan Thinnes
+Building upon the previous dc article, we explore a modifier-based approach to generalized dc loops.
+
+## What's DC?
+
+[In my previous post on `dc`](https://dylant.org/blog/dc-loops), we learned the
+basics of the language, and how to build more advanced looping constructs using
+macros. In the process, we considered the matter of not polluting the main
+stack, and the setup/teardown pattern common to stack-based languages.
+
+In this post, we'll look at a different, modifier-based approach to loops,
+which allows you to mix and match different loop behaviours as you need them.
+
+## The Fundamental Loop
+
+To begin, we will create the most fundamental & open-ended loop, composed of
+four components:
+
+* Preloop
+* Postloop
+* Predicate
+* Cleanup

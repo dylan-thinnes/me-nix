@@ -1,0 +1,785 @@
+μ-Recursion: Implementation in Untyped Lambda Calculus
+Dylan Thinnes
+An explanation of what μ-recursion is, and a walkthrough on how to implement it in the untyped lambda calculus.
+
+## Defining μ-Recursion
+
+Let's start by covering what μ-recursive functions are. This will be the first
+section of this post - the second will cover how we express μ-recursive
+functions in the lambda calculus.
+
+[As Wikipedia helpfully
+states](https://en.wikipedia.org/wiki/%CE%9C-recursive_function), 
+
+> In mathematical logic and computer science, the [\ldots] μ-recursive functions
+> are a class of partial functions from natural numbers to natural numbers 
+
+This description is not as intimidating as it sounds. 
+
+Firstly, a partial function from natural numbers to natural numbers is simply
+some function that can take $k$ numbers, $x_1,\ldots,x_k$, and is not
+necessarily defined for all possible numbers that could be passed to it.
+
+Secondly, "a class of partial functions" only means that any possible partial
+function one could define is either in this class or are not.
+
+$\text{all functions } = \{f_1, f_2, ...\} \cup \{g_1, g_2, ...\}$  
+$\{f_1, f_2, ...\} \in \text{ class of }\mu\text{-recursive functions}$  
+$\{g_1, g_2, ...\} \notin \text{ class of }\mu\text{-recursive functions}$  
+
+When we say a function is "μ-recursive", what we mean is that it belongs to
+this class. So, how do we decide whether a function is "μ-recursive" (belongs
+to the class) or not? 
+
+Well, a function is said to belong to the class of μ-recursive functions if it
+can be created using exclusively the following six functions: 
+
+**The Initials**: $Z$, $S$, $P$  
+
+The "initials" are the basic functions: they take numbers or multiple numbers
+and produce a single new number. We'll cover these first.
+
+**The Operators**: $\circ$, $\rho$, and $\mu$
+
+The "operators", on the other hand, are the higher-order functions: they take
+functions and produce more complex, more useful functions. Since they are
+complex, I will take a bit longer to explain them and give examples of their
+use.
+
+## Defining μ-Recursion: Initials 
+
+> The "initials" are the basic functions: they take numbers or multiple numbers
+  and produce a single further number.
+
+1. ### Zero function $Z$
+
+   <center>
+   $Z(x_{1},\ldots ,x_{k})=0$
+   </center>
+
+   The definition of the **zero function** is the simplest to understand -
+   given any number $k$ of values, it will ignore all of them and return $0$.
+
+   For example, one could have a zero function which takes three arguments,
+   and always returns the result $0$.
+
+   What is important to remember is that there isn't just one zero function.
+   There is a zero function for each possible $k$ number of arguments. For
+   example,
+
+   $Z_1(x_{1})=0$
+
+   $Z_2(x_{1}, x_{2})=0$
+
+   $Z_3(x_{1}, x_{2}, x_{3})=0$
+
+   However, we can omit this subscript for simplicity's sake and assume $Z$
+   always takes the number of arguments needed in its situation.
+
+2. ### Successor function $S$
+
+   <center>
+   $S(x){\stackrel {\mathrm {def} }{=}}x+1$
+   </center>
+
+   The **successor function** is also simple to understand - given a number
+   $x$ it will return $x + 1$. For example,
+
+   $S(1) = 2$
+
+   $S(2) = 3$
+
+   Unlike the zero function, there is only one successor function.
+
+3. ### Projection function $P$
+
+   <center>
+   $P_{k}^{i}(x_{1},\ldots ,x_{k}){\stackrel {\mathrm {def} }{=}}x_{i}$
+   </center>
+
+   This function is slightly more complicated. Given a tuple of $k$
+   arguments, it will return the $i$-th argument. For example,
+
+   $P_2^1(x_1, x_2)=x_1$  
+
+   $P_2^2(x_1, x_2)=x_2$  
+
+   $P_3^2(x_1, x_2, x_3)=x_2$  
+
+   $P_{100}^3(x_1, x_2, x_3,\ldots ,x_{100})=x_3$  
+
+   Much like the zero function, there is a projection function for every
+   possible $i$, $k$. However, in this case it *is* necessary to provide the
+   $i$ and $k$ arguments.
+
+## Defining μ-Recursion: Operators
+
+> The "operators" are the higher-order functions: they take functions and
+  produce more complex, more useful functions. Since they are complex, I will
+  take a bit longer to explain them and give examples of their use.
+
+4. ### Composition Operator $\circ$
+   
+   <center>
+   $h\circ (g_{1},\ldots ,g_{m}){\stackrel {\mathrm {def} }{=}}f$
+   </center>
+
+   <center>
+   Where $f$ is defined as:
+   </center>
+
+   <center>
+   $f(x_{1},\ldots ,x_{k})=h(g_{1}(x_{1},\ldots ,x_{k}),\ldots ,g_{m}(x_{1},\ldots ,x_{k}))$
+   </center>
+
+   #### Understanding the Definition
+
+   There's a lot to unpack here, so let's start with a brief explanation of
+   what the the composition operator does.
+
+   To begin, the composition function takes a single function $h$ and takes $m$
+   functions, $g_1,\ldots,g_m$, producing a new function $f$.
+   
+   $f$ then takes $k$ new arguments, $x_1,\ldots,x_k$, and applies each
+   function $g_i$ to all $k$ arguments $x_j$ to produce $m$ results,
+   $r_1,\ldots,r_m$.
+
+   $r_1=g_1(x_1,\ldots,x_k)$
+   $r_2=g_2(x_1,\ldots,x_k)$
+   $r_3=g_3(x_1,\ldots,x_k)$
+   $\ldots$
+   $r_m=g_m(x_1,\ldots,x_k)$
+
+   Finally, it applies $h$ to all $m$ results $r_i$.
+
+   $\text{final result} = h(r_1,\ldots,r_m)$
+
+   #### A Note on Intermediate Functions
+
+   Written out in full without intermediate $f$ and $r_j$, our definition would
+   look a little something like this:
+
+   $\begin{align*}
+    (h \circ (g_1,\ldots,g_m))(x_1,\ldots,x_k)
+   =\  & h(,\\
+   & \quad g_1(x_1,\ldots,x_k),\\
+   & \quad g_2(x_1,\ldots,x_k),\\
+   & \quad \ldots\\
+   & \quad g_m(x_1,\ldots,x_k)\\
+   & )
+   \end{align*}$
+
+   As you can see, we surround $h \circ (g_1,\ldots,g_m)$ with parentheses
+   before applying it to the k-tuple $(x_1,\ldots,x_k)$ to show that the
+   composition of $h$ and $g$ produces a new function which *then* takes the
+   k-tuple.
+
+   This is relatively confusing, so to keep definitions simpler looking and
+   easier to read, we have opted to define a new $f$ and move the rest of the
+   behaviour to its definition instead.
+
+   #### Working Through a Sample Problem
+
+   Let's step through the example functions provided above for $f(1, 5)$.
+
+   First, we get all $r_i$:
+
+   $r_1 = g_1(1, 5) = 1 + 5 = 6$
+
+   $r_2 = g_2(1, 5) = 2 * 1 + 5 = 7$
+
+   $r_3 = g_3(1, 5) = 3 * 1 + 5 = 8$
+
+   Then, we apply $h$ to all $r_i$:
+
+   $h(r_1, r_2, r_3) = r_1 + r_2 + r_3$
+
+   $h(r_1, r_2, r_3) = 6 + 7 + 8 = 21$
+
+   Expanded in full, we have,
+
+   $f(1, 5) = h(r_1, r_2, r_3)$
+
+   $f(1, 5) = h(r_1, r_2, r_3)$
+
+   $f(1, 5) = h(g_1(1, 5), g_2(1, 5), g_3(1, 5))$
+
+   $f(1, 5) = h(1 + 5, 2 * 1 + 5, 3 * 1 + 5)$
+
+   $f(1, 5) = 1 + 5 + 2 * 1 + 5 + 3 * 1 + 5$
+
+   $f(1, 5) = 6 + 7 + 8$
+
+   $f(1, 5) = 21$
+
+   Finally we can skip $f$ as an intermediary and replace it with $h \circ
+   (g_1, g_2, g_3)$:
+
+   $(h \circ (g_1, g_2, g_3))(1, 5) = 21$
+
+   This will be a general pattern when doing these compositions by hand --
+   figure out $f$ by computing $r_i$, then pass them to $h$.
+
+   #### Usage Examples
+
+   The usefulness of the composition operator is not immediately obvious.
+   They become more apparent when used with the next two operators.
+   However, here are a few simple usage examples for the composition
+   operator that use only initials:
+
+   * Adds $2$ to any argument:
+
+     $S \circ S = f \text{ where } f(x) = x + 2$
+
+   * Returns $2$ no matter what arguments:
+
+     $S \circ S \circ Z = f \text{ where } f(x_1, \ldots, x_k) = 2$
+
+   * Swaps the arguments of any $2$-ary function $h$:
+
+     $(h \circ (P_2^2, P_2^1))(x, y)$
+
+     For example, if $h(x,y) = x - y$,  
+
+     $(h \circ (P_2^2, P_2^1))(x, y) = y - x$
+
+5. ### Primitive Recursion Operator $\rho$
+
+   <center>
+   $\rho(g, h){\stackrel {\mathrm {def} }{=}}f$
+   </center>
+
+   <center>
+   Where $f$ is defined as:
+   </center>
+
+   <center>
+   $\begin{align*}
+   f(y,x_{1},\ldots,x_{k})&=h(y-1,f(y-1,x_{1},\ldots ,x_{k}),x_{1},\ldots ,x_{k})\\
+   f(0,x_{1},\ldots,x_{k})&=g(x_{1},\ldots ,x_{k})
+   \end{align*}$
+   </center>
+
+   #### Understanding the Definition
+
+   The gist of the primitive recursion operator is that it takes a function
+   $g$, applies it to arguments $x_1, \ldots, x_k$, and saves the result. 
+
+   $a_0 = g(x_1, \ldots, x_k)$
+   
+   and then applies a function $h$ to that result, $y$ times, returning the
+   final result.
+
+   $a_1 = h(0, a_0, x_1, \ldots, x_k)$
+   $a_2 = h(1, a_1, x_1, \ldots, x_k)$
+   $a_3 = h(2, a_2, x_1, \ldots, x_k)$
+   $\ldots$
+   $a_y = h(y-1, a_{y-1}, x_1, \ldots, x_k)$
+
+   Since our final result is $a_y$,
+
+   $\text{final result} = (rho(g,h))(y,x_1,\ldots,x_k) = a_y$
+
+   Note that we also pass the current value of $i$ in $a_i$, and $x_1, \ldots,
+   x_k$ into each call of $h$, so as to give it access to the numbers we
+   started with, though not the ability to change them. The only number $h$ can
+   change is a_i.
+
+   From this list we can derive a general equation for $a_l$.
+
+   $a_l = h(l-1, a_{l-1}, x_1, \ldots, x_k),\quad \forall l \in 1\ldots y$
+
+   > For a further explanation of how this simplification is derived, refer to
+     [this addendum](#addendum-deeper-understanding-of-ρ).
+     Understanding this is not necessary to read the rest of the post.
+
+   #### Working Through a Sample Problem
+
+   Let's use another sample problem to make sure we understand the behaviour of
+   our recursion operator, $\rho$. We will go step by step through the
+   simplification.
+
+   This time, we will use the example of $h(y, a, x_1, x_2) = a + 2$ and
+   $g(x_1, x_2) = x_1 + x_2$.  Since $\rho(g,h)$ passes in arguments directly
+   to $g$, that means $\rho(g,h)$ takes $y$ and two further arguments, $x_1$
+   and $x_2$.
+
+   First, let's calculate $a_0$ for $(\rho(g,h))(y, c, d)$:
+
+   $a_0 = g(x_1, x_2) = g(c, d) = c + d$
+
+   This is relatively straightforward, as we can see $x_1 = c,\ x_2 = d$.
+
+   Now, the repeated step:
+
+   $a_1 = h(0, a_0, x_1, x_2) = a_0 + 2 = c + d + 2$  
+   $a_2 = h(1, a_1, x_1, x_2) = a_1 + 2 = c + d + 2 + 2$  
+   $a_3 = h(2, a_2, x_1, x_2) = a_2 + 2 = c + d + 2 + 2 + 2$  
+   $\ldots$  
+   $a_y = h(y-1, a_{y-1}, x_1, x_2) = a_3 + 2 = c + d + 
+                             \underbrace{2 + 2 + 2 + \ldots + 2}_{y}$  
+
+   So, since the $+2$ is repeated $y$ times, our final result $a_y$ is\ldots
+   
+   $a_y = c + d + 2 * y$
+
+   Now we can choose $y$ and $c$ and plug them in. For example, if we chose
+   $y = 10$ and $c = 3 and $d = 4$
+
+   $(\rho(g,h))(10, 3, 4) = 3 + 4 + 2 * 10$
+   $(\rho(g,h))(10, 3, 4) = 27$
+
+   #### Defining Addition using Primitive Recursion
+
+   Now we will present a practical application of primitive recursion and
+   composition combined.
+
+   One thing that is important in μ-recursive functions is to realize that
+   though we have been using addition ($+$) in our examples above, no
+   initials define an addition operator between numbers.  The $S$ initial
+   defines how to increment a number by 1, but not how to add two numbers
+   together.
+
+   Thus far we've been assuming addition of two numbers exists, but we have
+   not actually shown that such a function actually belongs to the μ-recursive
+   class.
+
+   Now, instead of taking the plus operator for granted, we can define it as
+   follows:
+
+   $\text{plus}(a,b) = \rho(P_1^1,S \circ P_3^2)(a,b)$  
+
+   To understand this, we'll proceed as follows:
+   1. Figure out what addition really *is* at its core.
+   2. Write a basic solution based off of insights in step 1
+   3. Step through the solution to be sure it works.
+   4. Formalize the solution into μ-recursive terms.
+
+   ##### Addition at its Core
+
+   Let's begin our exploration of addition by noticing that we can decompose
+   any natural number, say $a$, into the base number 0 and an $+1$ operator
+   used $a$ times.
+
+   $0 = 0$  
+   $1 = 1 + 0$  
+   $2 = 1 + 1 + 0$  
+   $3 = 1 + 1 + 1 + 0$  
+   $a = \underbrace{1 + \ldots + 1}_{a} + 0$
+
+   This allows us to decompose the addition of any two numbers $a$, $b$ into
+   the base $b$ and again the $+1$ operator used $a$ times.
+
+   $0 + 4 = 4$
+   $1 + 4 = 1 + 4$
+   $2 + 4 = 1 + 1 + 4$
+   $3 + 4 = 1 + 1 + 1 + 4$  
+   $a + b = \underbrace{1 + \ldots + 1}_{a} + b$
+
+   This very simple insight underpins such far-reaching concepts as Church
+   numerals, hyperoperations, the Peano axioms, and now (as we will shortly
+   see) defining addition in μ-recursion.
+
+   ##### Writing a Solution
+
+   Now, we have expressed the concept of addition in terms that the initials of
+   μ-recursion can accomodate.
+
+   $add_0(b) = b$  
+   $add_1(b) = S(b)$  
+   $add_2(b) = S(S(b))$  
+   $add_3(b) = S(S(S(b)))$  
+   $add_a(b) = \underbrace{S(\ldotsS(}_{a}b))$
+
+   This serves as a solution for any given $a$, provided we know $a$ when we
+   are writing the function, we can write a function $add_a(b)$ which will add
+   $a$ to any possible $b$.
+
+   This approach will not work for such programs where we don't know
+   $a$ when writing the function. It is *not general*, in that we don't have a
+   function which actually expresses $add(a,b)$ for any, possible unknown, $a$
+   and $b$.
+
+   However, we do have the primitive-recursion operator, which can apply a
+   function $h$ to a result $g(x_1,\ldots,x_k)$, $y$ times. So, by defining
+   $h(y, a, x_1) = S(a)$ and $g(x_1) = x_1$, we can have a proper addition
+   function!
+
+   ##### Verifying Our Solution
+
+   Let's start with a simple visual proof and proceed.
+
+   $a_0 = g(x_1) = g(b) = b$  
+   $a_1 = h(0, a_0, x_1) = S(a_0) = S(b)$  
+   $a_2 = h(1, a_1, x_1) = S(a_1) = S(S(b))$  
+   $a_3 = h(2, a_2, x_1) = S(a_2) = S(S(S(b)))$  
+   $\ldots$  
+   $a_y = h(y-1, a_{y-1}, x_1) = S(a_2) = \underbrace{S(\ldots S(}_{y}b))$  
+
+   Thus, the end result for $a_y$ is
+
+   $(\rho(g,h))(y, b) = a_y$  
+   $(\rho(g,h))(y, b) = \underbrace{S(\ldots S(}_{y}b))$  
+   $(\rho(g,h))(y, b) = y + b$
+
+   Thus, $\rho(g,h)$ defines a function which takes two arguments and returns
+   their sum.
+
+   ##### Formalizing the Solution
+
+   **But** we are not done yet -- we need to define both $g$ and $h$ in terms
+   of ininitials and compositions as well.
+
+   This is easy for $g$, since it takes one argument, and returns one argument,
+   we can define it as $P_1^1$, which takes $k=1$ arguments and returns the
+   $i=1$th argument.
+
+   For $h$ this is also reasonably simple. $h$ is essentially two operations:  
+   The first operation extracts the 2nd argument from 3 original arguments,
+   which we can recognize as $P_3^2$.  
+   The second operation adds one to the result, which we can recognize as $S$.  
+   All that's left is to compose them, and our resulting function $S \circ $
+   expresses the $h$ we desire.
+
+   Thus, our final sum function is expressed as $\rho(P_1^1,S \circ P_3^2)$. It
+   takes two arguments, $y$ and $b$, and produces $y + b$.
+
+6. ### Minimization Operator $\mu$
+
+   <center>
+   $\mu(f)(x_{1},\ldots ,x_{k})=j$
+   </center>
+
+   Where $j$ is the lowest positive integer for which $f(j,x_1,\ldots,x_k) =
+   0$.
+
+   More formally,
+
+   $f(j,x_{1},\ldots ,x_{k}) = 0\quad {\text{and}}$  
+
+   $f(i,x_{1},\ldots ,x_{k}) > 0\quad {\text{for}}\quad i=0,\ldots ,j-1$
+
+   #### Understanding the Definition
+
+   The minimization operator is actually quite a bit simpler to explain than
+   both composition ($\circ$) and primitive recursion ($\rho$). It begins by
+   passing $j=0$ and $x_1,\ldots,x_k$ to $h$:
+
+   $a_0 = h(0, x_1,\ldots,x_k)$
+
+   If $a_0 = 0$, then it returns $0$. Otherwise, it continues to increment $j$
+   by one, until $a_j = h(j,x_1,\ldots,x_k) = 0$, and then returns $j$.
+
+   $\text{if } a_0 = 0 \text{, return } 0$  
+   $\text{otherwise:}$  
+
+   $a_1 = h(1, x_1,\ldots,x_k)$  
+
+   $\text{if } a_1 = 0 \text{, return } 1$  
+   $\text{otherwise:}$  
+
+   $a_2 = h(2, x_1,\ldots,x_k)$  
+
+   $\text{if } a_2 = 0 \text{, return } 2$  
+   $\text{otherwise:}$  
+
+   $\ldots$
+
+   #### Working Through a Sample Problem
+
+   As for the previous two operators, we will work through a sample problem for
+   this operator.
+
+   Let's suppose we want to calculate $\sqrt{9}$. The simplest way to calculate
+   this is as follows:
+
+   $h(z,x_1)=9-z^2$  
+   $\mu(h)(x_1)$
+
+   To see why this is the case, let's solve this using our the simplified
+   definition above.
+
+   $a_0 = h(0,x_1) = 9-0^2 = 9$  
+
+   $a_0 \neq 0 \text{ so we continue:}$  
+   $a_1 = h(1,x_1) = 9-1^2 = 8$  
+
+   $a_1 \neq 0 \text{ so we continue:}$  
+   $a_2 = h(2,x_1) = 9-4^2 = 5$  
+
+   $a_2 \neq 0 \text{ so we continue:}$  
+   $a_3 = h(1,x_1) = 9-3^2 = 0$  
+
+   $a_3 = 0 \text{ so we return } 3$
+
+   Note that if $h$ is always greater than $0$, the calculation never ends.
+
+   #### The Power of Minimization
+   
+   There is a lower class of functions called the "primitive-recursive
+   functions". These are defined using the three initials $Z$, $S$, and $P$,
+   and the first two operators $\circ$ and $\rho$, but not $\mu$.
+
+   This tells us that the minimization operator is in fact critical to the
+   power that μ-recursion has. However, discussing the finer points of
+   computational complexity and the advanced power that while loops (expressed
+   using $\mu$) have over for loops (expressed using $\rho$).
+
+### Equivalent Models of Computation
+
+It turns out that the class of μ-recursive functions contains exactly all
+computable functions. This means they are as "powerful" and can express exactly
+the same algorithms as Turing machines or the lambda calculus, two other common
+models of computation and computability.
+
+## Onwards to the Lambda Calculus
+
+What we will be doing now is showing that any μ-recursive function can be
+defined using the lambda calculus, proving that the lambda calculus is *at
+least as powerful* as μ-recursion. 
+
+Proving that the lambda calculus is *exactly as powerful* as μ-recursion
+requires us to prove that any term in the lambda calculus can be expressed by
+μ-recursive functions, which is a topic for another blog post on another day.
+
+As we step through implementations of functions, we will also cover how to
+generate some functions from the Church numerals that represent their
+subscripts. For example, we will go over how to generate $Z_k$ in the lambda
+calculus from the Church numeral for $k$.
+
+While this is not necessary to understanding the correspondence between the
+two, I think it is interesting and related enough to merit discussion in this
+post.
+
+### Prerequisite: Learning the Lambda Calculus
+
+Admittedly, the lambda calculus is a large subject -- explaining it here to the
+uninitiated would be time-consuming and prone to error. If you consider
+yourself shaky on the subject, or have never heard of the untyped lambda
+calculus, I would strongly recommend reading [this quick
+introduction to it](http://www.inf.fu-berlin.de/lehre/WS03/alpi/lambda.pdf).
+
+This blog post will make extensive use of tuples and Church numerals.
+
+### Setting Up a REPL
+
+If you are interested in running the code examples I have here, I recommend
+compiling and using Luke Geeson's highly useful [calculus
+zoo](https://github.com/lukeg101/lplzoo/tree/master/ULC).
+
+Simply follow the instructions on the page's README and run the resulting
+`Main` executable to start the Lambda Calculus REPL.
+
+Now let's get started!
+
+### Successor Function
+
+The first and simplest function to implement in the lambda calculus is $S$, the
+successor function. It is one of the first things you learn when covering
+Church Numerals.
+
+```
+S ≡ λn.λf.λx.f (n f x)
+```
+
+There isn't much to be said here - this is *the* canonical way to define
+succession in the lambda calculus. It takes the Church numeral `n` and produces
+a new function which, given `f` and `x`, invokes `f` one more time on `x` than
+`n` would.
+
+### Zero Function
+
+Another simple function to implement in the lambda calculus is $Z$, the zero
+function.
+
+<code>
+Z_k ≡ λa_1...λa_k.(λf.λx.x)
+</code>
+
+As we can see, the corresponding lambda function for $Z_k$ takes $k$ arguments
+and then returns the Church numeral for zero, `(λf.λx.x)`.
+
+#### Writing a Zero Function Generator
+
+In the example above we showed that it is possible to construct a function for
+any given $k$ in the lambda calculus that matches the corresponding function
+$Z_k$ in μ-recursion.
+
+In this subsection we will discuss the ability to construct a function in the
+lambda calculus that takes a church numeral $k$ and generates the corresponding
+function for $Z_k$.
+
+Let's begin with writing out the definition of a Church numeral $k$.
+
+```
+λf.λx.f(f(...f(f x)))
+; "f" is invoked k times.
+```
+
+Since we are constructing a function gradually, we need to find the
+following values:
+
+* A value `x` which, on its own, represents $Z_0$. $Z_0$ is a function which
+  takes zero arguments and returns the church numeral for `0`. This is clearly
+  `0` itself:
+
+  ```
+  x ≡ λg.λy.y
+  ```
+
+* An inductive function `f` which, given an existing function that corresponds
+  to $Z_{k-1}$, turns it into a function that corresponds to $Z_k$.
+
+  ```
+  f(Z_k-1) ≡ Z_k
+  ```
+
+  This way, once `f` is invoked $k$ times on `x`, which is $Z_0$, our result
+  will be the $Z_k$ we seek.
+
+Luckily, such a function `f` is relatively simple:
+
+```
+λg.λz.g
+```
+
+To understand why this works, let's step through an example of the β-reduction
+for `f[g:=Z_k-1]`.
+
+First, we assume that we have some function in the lambda calculus `Z_k-1`
+which corresponds to the μ-recursive function $Z_{k-1}$.
+
+```
+Z_k-1 = 
+```
+
+### Projection
+
+Next, we will tackle the projection function.
+
+#### Writing a Projection Function Generator
+
+## Addendum: Deeper Understanding of ρ
+
+Of course, for many of you it is not sufficient to only be able to parrot a
+simplification of the operator -- you want to see how the original definition
+translates to $\rho$'s simplified, in-words definition. Let's begin.
+
+For convenience, I'll copy the original and simplified definitions here.
+
+### Original Definition
+
+<center>
+$\rho(g, h){\stackrel {\mathrm {def} }{=}}f$
+
+Where $f$ is defined as:
+
+$\begin{align*}
+f(y,x_{1},\ldots,x_{k})&=h(y-1,f(y-1,x_{1},\ldots ,x_{k}),x_{1},\ldots ,x_{k})\\
+f(0,x_{1},\ldots,x_{k})&=g(x_{1},\ldots ,x_{k})
+\end{align*}$
+</center>
+
+### Simplified Definition
+
+$(rho(g,h))(y,x_1,\ldots,x_k) = a_y$  
+$\text{where}$  
+$a_0 = g(x_1, \ldots, x_k)$  
+$a_1 = h(0, a_0, x_1, \ldots, x_k)$  
+$a_2 = h(1, a_1, x_1, \ldots, x_k)$  
+$a_3 = h(2, a_2, x_1, \ldots, x_k)$  
+$\ldots$  
+$a_y = h(y-1, a_{y-1}, x_1, \ldots, x_k)$  
+
+### Understanding the Full Definition
+
+Let's look at the behaviour of $f$'s general step in the original definition.
+As you can see, it returns $h$ applied to new $y-1$ and $x_1,\ldots,x_k$, and
+more importantly applies $h$ to a second call of $f$, with $y-1$ as the new
+argument:
+
+$f(y,x_{1},\ldots,x_{k})
+= h(y-1,\underbrace{f(y-1,x_{1},\ldots ,x_{k})}_{\text{calling } f \text{ again, but with } y-1},x_{1},\ldots ,x_{k})$
+
+Of course, the second call to $f$ with $y-1$ will yet again call itself
+$(y-1)-1$\ldots
+
+$f(y-1,x_{1},\ldots,x_{k})
+= h(y-1,\underbrace{f(y-1-1,x_{1},\ldots ,x_{k})}_{\text{calling } f \text{ again, but with } y-2},x_{1},\ldots ,x_{k})$
+
+And so on, until we reach $f(0,x_1,\ldots,x_k)$, where the second definition
+kicks in:
+
+$f(0,x_1,\ldots,x_k) = g(x_1,\ldots,x_k)$
+
+Thus, our final execution, by substituting every call of $f$ with its
+corresponding $h$ or $g$, looks like this:
+
+$\begin{align*}
+\noindent f(y,x_1,\ldots,x_k)=
+& \quad h(y-1,\\
+& \qquad h(y-2,\\
+& \qquad \qquad \ldots\\
+& \qquad \qquad \qquad h(0,\\
+& \qquad \qquad \qquad \qquad g(x_1,\ldots,x_k),\\
+& \qquad \qquad \qquad \qquad x_1,\ldots,x_k\\
+& \qquad \qquad \qquad )\\
+& \qquad \qquad \ldots\\
+& \qquad \qquad x_1,\ldots,x_k\\
+& \qquad ),\\
+& \qquad x_1,\ldots,x_k\\
+& \quad )
+\end{align*}$
+
+We can now replace terms with their corresponding definitions in $a_0$ and
+see that this full substitution has the exact same behaviour as the
+simplification we defined earlier.
+
+$a_0 = g(x_1,\ldots,x_k)$  
+$a_l = h(l-1, a_{l-1}, x_1,\ldots,x_k), \quad \forall l \in 1\ldots y$
+
+First, replace $g$ with $a_0$:
+
+$\begin{align*}
+\noindent f(y,x_1,\ldots,x_k)=
+& \quad h(y-1,\\
+& \qquad h(y-2,\\
+& \qquad \qquad \ldots\\
+& \qquad \qquad \qquad h(0,\\
+& \qquad \qquad \qquad \qquad \underbrace{g(x_1,\ldots,x_k)}_{a_0},\\
+& \qquad \qquad \qquad \qquad x_1,\ldots,x_k\\
+& \qquad \qquad \qquad )\\
+& \qquad \qquad \ldots\\
+& \qquad \qquad x_1,\ldots,x_k\\
+& \qquad ),\\
+& \qquad x_1,\ldots,x_k\\
+& \quad )
+\end{align*}$
+
+Then, replace $h(0,\ldots)$ with $a_1$:
+
+$\begin{align*}
+\noindent f(y,x_1,\ldots,x_k)=
+& \quad h(y-1,\\
+& \qquad h(y-2,\\
+& \qquad \qquad \ldots\\
+& \qquad \qquad \qquad \underbrace{h(1,a_0,x_1,\ldots,x_k)}_{a_1}\\
+& \qquad \qquad \ldots\\
+& \qquad \qquad x_1,\ldots,x_k\\
+& \qquad ),\\
+& \qquad x_1,\ldots,x_k\\
+& \quad )
+\end{align*}$
+
+And so on, until we replace all the way to $h(y-1,\ldots)$:
+
+$\begin{align*}
+\noindent f(y,x_1,\ldots,x_k)=
+& \quad h(y-1,\\
+& \qquad \underbrace{h(y-2,a_{y-2},x_1,\ldots,x_k)}_{a_{y-1}},\\
+& \qquad x_1,\ldots,x_k\\
+& \quad )
+\end{align*}$
+
+$f(y,x_1,\ldots,x_k)=
+\underbrace{h(y-1,a_{y-1},x_1,\ldots,x_k)}_{a_y} = a_y$

@@ -1,0 +1,59 @@
+Rewriting This Website
+Dylan Thinnes
+Migrating from Rails to Bash
+
+### The (Minor) Issue(s)
+
+Originally, this site was written in Rails, deployed on Heroku. While this had
+the advantage of being free (yay!) and easy, this posed a couple of problems:
+
+1. Overcomplicated
+    As you may have noticed, this is a very simple site. I don't need complex
+    templating languages, or an ORM, or a clear MVC philosophy, to guide what
+    is essentially a few static pages with predefined variations. Setting up a
+    new section for the site was slow. This is not so much a lament about Rails
+    - it's a comment on how excessive such a framework is for my use case.
+
+2. Slow Responses
+    To boot, the site was slow, as Heroku's free tier regularly puts your site
+    to sleep if it doesn't have many visitors. No matter how small I made the
+    site, it would take 2 - 10 seconds to respond to a new request. This is
+    this terrible for user retention; if I connected to a site this slow to
+    respond, I'd assume it's down.
+
+3. Remote Updates
+    All dynamic content was built from ActiveRecord entries, which were in turn updated from txt files, one per 
+
+### False Starts
+
+So, clearly I had to solve this. I decided the site would probably be best off
+as a static site hosted on S3 or Github Pages. This much was clear: generating
+each page from templates made the site much slower than it had to be, even
+without Heroku.
+
+For a time I played around with doing it in Hakyll, or writing my own [CMS from
+scratch in Haskell](https://github.com/dylan-thinnes/me-two-thanks), or
+scraping the site to create static snapshots, or scrapping the site entirely.
+
+#### Hakyll
+
+Hakyll was a fine start, but I found that it didn't get me a whole lot of
+knowledge outside of configuring the library and writing up items - it wasn't
+very intellectually engaging, outside of it, well, being Haskell. 
+
+Also, taking anything in a completely new direction wasn't simple under Hakyll,
+as it is purpose-built and very specific. This is a pro in most cases, but
+given that this site is supposed to be a *personal* playground, maybe locking
+in too early, like I did with Rails, would just lead to the same
+dissatisfaction and eventual stagnation.
+
+#### Scraping
+
+Scraping looked good on the surface (get it?), but it wouldn't free me from
+Rails, and so in many ways that had the same issues as Hakyll - constant
+lock-in to one monolithic framework where new tries wouldn't be great.
+
+#### Scrapping
+
+I thought long and hard on whether I even wanted to keep it. Honestly, I really
+hope to continue with this one.
