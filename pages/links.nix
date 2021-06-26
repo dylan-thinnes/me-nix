@@ -185,14 +185,18 @@ let
   toFragment = { url, name, description }: ''
     <div>
         <a href='${url}' data-disable-mocking='true' class='entry'>
-          <h3 class='text'>${title}</h3>
+          <h3 class='text'>${name}</h3>
           ${description}
         </a>
     </div>
   '';
 in
-''
-<h2>links I find interesting</h2>
-${builtins.concatStringsSep "\n"
-  (builtins.map toFragment links)}
-''
+mkPage {
+  title = "Links I Find Interesting";
+  url = "/links";
+  rawContent = ''
+    <h2>Links I Find Interesting</h2>
+    ${builtins.concatStringsSep "\n"
+      (builtins.map toFragment links)}
+  '';
+}
