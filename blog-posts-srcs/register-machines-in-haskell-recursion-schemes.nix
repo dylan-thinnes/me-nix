@@ -2,7 +2,7 @@
     title = "Register Machines, Part 4 - Nondeterminism, Rose Trees, and Data as Computation";
     author = "Dylan Thinnes";
     description = "In this post, we go over how we can add nondeterminism to our machines using rose trees and a bit of thinking.";
-    time = "";
+    time = "1629728156";
     content = ''
 
 It's more common than you'd think.
