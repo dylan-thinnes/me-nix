@@ -49,6 +49,15 @@ in
 {
   inherit mkBlogPost;
   outputs = {
-    replicator = mkBlogPost (import ./nixified-articles/replicator.nix);
+    register-machines-in-haskell-recursion-schemes = mkBlogPost (import ./blog-posts-srcs/register-machines-in-haskell-recursion-schemes.nix);
+    register-machines-in-haskell-custom-instructions = mkBlogPost (import ./blog-posts-srcs/register-machines-in-haskell-custom-instructions.nix);
+    register-machines-in-haskell-labels = mkBlogPost (import ./blog-posts-srcs/register-machines-in-haskell-labels.nix);
+    register-machines-in-haskell = mkBlogPost (import ./blog-posts-srcs/register-machines-in-haskell.nix);
+    replicator = mkBlogPost (import ./blog-posts-srcs/replicator.nix);
+    bash-static-site-generator = mkBlogPost (import ./blog-posts-srcs/bash-static-site-generator.nix);
+    guidelines-for-learning-from-projects = mkBlogPost (import ./blog-posts-srcs/guidelines-for-learning-from-projects.nix);
+    dc-loops = mkBlogPost (import ./blog-posts-srcs/dc-loops.nix);
+    fibnk = mkBlogPost (import ./blog-posts-srcs/fibnk.nix);
+    welcome = mkBlogPost (import ./blog-posts-srcs/welcome.nix);
   };
 }
