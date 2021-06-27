@@ -8,7 +8,7 @@ let
   mkBlogPost =
     { title
     , author ? "Dylan Thinnes"
-    , time ? builtins.currentTime
+    , time ? builtins.toString builtins.currentTime
     , description ? ""
     , content
     }:
