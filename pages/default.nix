@@ -5,6 +5,7 @@ with nixpkgs;
 let
   static = import ../static.nix { inherit nixpkgs; };
   fragments = import ../fragments.nix { inherit nixpkgs; };
+  sanitizeName = (import ../utils.nix { inherit nixpkgs; }).sanitizeName;
 
   mkPage = args@{ title, url, rawContent, ... }:
     let
@@ -16,7 +17,7 @@ let
     in
     args // {
       blogPath = url;
-      forest = runCommand "forest-${title}" {} ''
+      forest = runCommand "forest-${sanitizeName title}" {} ''
         mkdir -p $out/${url}
         cp ${surrounded} $out/${url}/index.html
         mkdir -p $out/nolayout/${url}

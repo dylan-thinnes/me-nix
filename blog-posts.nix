@@ -4,6 +4,7 @@ with nixpkgs;
 with (import ./pages { inherit nixpkgs; });
 
 let
+  sanitizeName = (import ./utils.nix { inherit nixpkgs; }).sanitizeName;
   mkBlogPost =
     { title
     , author ? "Dylan Thinnes"
@@ -13,7 +14,7 @@ let
     }:
     let
       date = time; # TODO: actually calculate visible instance of date
-      cleanName = nixpkgs.lib.strings.sanitizeDerivationName title;
+      cleanName = sanitizeName title;
       htmlFile =
         runCommand "blog-post-${cleanName}.html"
           {
