@@ -13,6 +13,7 @@ mkPage {
     <h2>Blog Posts</h2>
     ${builtins.concatStringsSep "\n"
       (builtins.map (s: s.entry)
-        (builtins.attrValues blog-posts.outputs))}
+        (builtins.sort (a: b: a.time > b.time)
+          (builtins.attrValues blog-posts.outputs)))}
   '';
 }
