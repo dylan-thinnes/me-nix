@@ -9,7 +9,7 @@ mkPage {
   title = "About Me";
   url = "/about";
   rawContent = ''
-<h2>about me & this site</h2>
+<h2>About Me & This Site</h2>
 <h3>Who are you?</h3>
 <p>
     Hello, my name is Dylan! I'm currently studying Computer Science at the

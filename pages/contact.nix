@@ -9,7 +9,7 @@ mkPage {
   title = "Contact Me";
   url = "/contact";
   rawContent = ''
-<h2>contact & cv</h2>
+<h2>Contact & CV</h2>
 
 <div><a href='mailto://dylan.thinnes@protonmail.com' class='entry' data-disable-mocking='true'>
   <h3 class='text'>dylan.thinnes@protonmail.com</h3>
