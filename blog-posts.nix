@@ -35,7 +35,7 @@ let
       rawContent = builtins.readFile htmlFile;
     in
     mkPage {
-      inherit title url rawContent;
+      inherit title url rawContent time;
       entry = ''
         <div>
             <a href='${url}' class='entry'>
